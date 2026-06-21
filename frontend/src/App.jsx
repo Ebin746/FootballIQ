@@ -101,7 +101,7 @@ export default function App() {
       </header>
 
       {/* ══ TAB BAR ══════════════════════════════════════════════════ */}
-      <nav className="flex gap-3 mb-8 relative z-10" role="tablist">
+      <nav className="flex flex-col sm:flex-row gap-3 mb-8 relative z-10" role="tablist">
         {TABS.map(({ key, label, icon }) => {
           const active = tab === key;
           return (

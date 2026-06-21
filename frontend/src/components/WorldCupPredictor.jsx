@@ -1,7 +1,23 @@
 import { useState } from "react";
 import { predictWorldCup } from "../api.js";
-import { flagEmoji } from "../utils/flags.js";
+import { isoCode } from "../utils/flags.js";
 import TournamentBracket from "./TournamentBracket.jsx";
+
+/* Inline flag image from flagcdn.com */
+function FlagImg({ team, size = 28 }) {
+  const iso = isoCode(team);
+  if (!iso) return <span style={{ opacity: 0.4 }}>🏳</span>;
+  return (
+    <img
+      src={`https://flagcdn.com/w80/${iso.toLowerCase()}.png`}
+      alt={team || ""}
+      width={size * 1.5}
+      height={size}
+      style={{ objectFit: "cover", borderRadius: 4, boxShadow: "0 2px 6px rgba(0,0,0,0.4)", flexShrink: 0 }}
+      onError={(e) => { e.currentTarget.style.display = "none"; }}
+    />
+  );
+}
 
 /* ── Animated football loading indicator ─────────────────────────────── */
 function FootballLoader({ n }) {
@@ -42,9 +58,8 @@ function Leaderboard({ results }) {
           return (
             <div
               key={r.team}
-              className="grid items-center gap-3 px-2 py-2.5 rounded-lg transition-all"
+              className="grid items-center gap-2 sm:gap-3 px-1 sm:px-2 py-2 sm:py-2.5 rounded-lg transition-all grid-cols-[24px_28px_1fr_48px] sm:grid-cols-[28px_32px_1fr_56px_140px]"
               style={{
-                gridTemplateColumns: "28px 32px 1fr 56px 140px",
                 background: isGold ? "rgba(245,197,24,0.05)" : "transparent",
                 borderBottom: "1px solid rgba(245,197,24,0.07)",
                 animation: `reveal-up 0.4s ${i * 40}ms ease-out both`,
@@ -60,7 +75,7 @@ function Leaderboard({ results }) {
 
               {/* Flag */}
               <div className="text-center" style={{ fontSize: "1.3rem", lineHeight: 1 }}>
-                {flagEmoji(r.team)}
+              <FlagImg team={r.team} size={20} />
               </div>
 
               {/* Team name */}
@@ -81,6 +96,7 @@ function Leaderboard({ results }) {
 
               {/* Bar */}
               <div
+                className="hidden sm:block"
                 style={{
                   height: 5,
                   background: "rgba(13,27,46,0.8)",
@@ -138,7 +154,7 @@ export default function WorldCupPredictor() {
     <div className="flex flex-col gap-6">
 
       {/* ══ Setup card ═════════════════════════════════════════════════ */}
-      <div className="glass-card p-7 sm:p-9">
+      <div className="glass-card p-5 sm:p-9">
         {/* Header */}
         <div className="mb-7">
           <h2 className="font-display uppercase text-[22px] tracking-widest m-0 text-ivory">
@@ -240,26 +256,28 @@ export default function WorldCupPredictor() {
       {/* ══ Champion banner (if results ready) ═══════════════════════ */}
       {champion && !loading && (
         <div
-          className="glass-card p-6 flex items-center gap-5"
+          className="glass-card p-5 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left"
           style={{
             border: "1px solid rgba(245,197,24,0.45)",
             boxShadow: "0 0 40px rgba(245,197,24,0.12)",
             animation: "reveal-up 0.5s ease-out both",
           }}
         >
-          <div className="animate-float text-[3rem] leading-none">{flagEmoji(champion.team)}</div>
+          <div className="animate-float">
+            <FlagImg team={champion.team} size={42} />
+          </div>
           <div>
             <div className="font-mono text-[11px] uppercase tracking-widest text-muted mb-1">
               Predicted Champion
             </div>
-            <div className="font-display font-bold text-[28px] uppercase tracking-widest shimmer-text">
+            <div className="font-display font-bold text-[24px] sm:text-[28px] uppercase tracking-widest shimmer-text">
               {champion.team}
             </div>
-            <div className="font-mono text-[13px] text-muted mt-1">
+            <div className="font-mono text-[12px] sm:text-[13px] text-muted mt-1">
               Won <span className="text-gold font-bold">{champion.win_pct.toFixed(1)}%</span> of {nSimulations} simulated tournaments
             </div>
           </div>
-          <div className="ml-auto text-[3rem] animate-float" style={{ animationDelay: "0.3s" }}>
+          <div className="sm:ml-auto text-[2.5rem] sm:text-[3rem] animate-float" style={{ animationDelay: "0.3s" }}>
             🏆
           </div>
         </div>

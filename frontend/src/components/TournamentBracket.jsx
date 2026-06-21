@@ -1,5 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { flagEmoji } from "../utils/flags.js";
+import { isoCode } from "../utils/flags.js";
+
+/* Inline flag image using flagcdn.com */
+function FlagImg({ team, size = 18 }) {
+  const iso = isoCode(team);
+  if (!iso) return <span style={{ opacity: 0.4, fontSize: size }}>🏳</span>;
+  return (
+    <img
+      src={`https://flagcdn.com/w40/${iso.toLowerCase()}.png`}
+      alt={team || ""}
+      width={size * 1.4}
+      height={size}
+      style={{ objectFit: "cover", borderRadius: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.5)", flexShrink: 0 }}
+      onError={(e) => { e.currentTarget.style.display = "none"; }}
+    />
+  );
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
    Layout constants (all in px — matches absolute positioning below)
@@ -134,7 +150,7 @@ function MatchCard({ teamA, teamB, round, delay = 0, isChampMatch = false }) {
       {/* Team rows */}
       <div style={{ padding: "2px 6px 6px" }}>
         <div style={rowStyle(teamA, w === teamA)}>
-          <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>{flagEmoji(teamA?.team)}</span>
+          <FlagImg team={teamA?.team} size={16} />
           <span
             style={{
               fontFamily: '"Oswald", sans-serif',
@@ -153,7 +169,7 @@ function MatchCard({ teamA, teamB, round, delay = 0, isChampMatch = false }) {
           {teamA && teamB && prob(aWin, w === teamA)}
         </div>
         <div style={rowStyle(teamB, w === teamB)}>
-          <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>{flagEmoji(teamB?.team)}</span>
+          <FlagImg team={teamB?.team} size={16} />
           <span
             style={{
               fontFamily: '"Oswald", sans-serif',
@@ -212,7 +228,7 @@ function ChampionDisplay({ team, delay }) {
       }}
     >
       <div style={{ fontSize: "2.4rem" }}>🏆</div>
-      <div style={{ fontSize: "2.2rem", lineHeight: 1 }}>{flagEmoji(team.team)}</div>
+      <FlagImg team={team.team} size={40} />
       <div
         style={{
           fontFamily: '"Oswald", sans-serif',

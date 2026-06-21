@@ -1,7 +1,23 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { getTeams, predictMatch } from "../api.js";
 import CountryWheel from "./CountryWheel.jsx";
-import { flagEmoji } from "../utils/flags.js";
+import { isoCode } from "../utils/flags.js";
+
+/* Renders a real flag image from flagcdn.com */
+function FlagImg({ team, size = 52 }) {
+  const iso = isoCode(team);
+  if (!iso) return <span style={{ fontSize: size * 0.7 }}>🏳</span>;
+  return (
+    <img
+      src={`https://flagcdn.com/w80/${iso.toLowerCase()}.png`}
+      alt={team}
+      width={size * 1.4}
+      height={size}
+      style={{ objectFit: "cover", borderRadius: 5, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
+      onError={(e) => { e.currentTarget.style.display = "none"; }}
+    />
+  );
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    Confetti — pure-React/CSS, no library needed
@@ -124,7 +140,7 @@ function ScoreStat({ value: raw, label, color, isWinner, enabled }) {
       <span
         className="font-mono font-bold"
         style={{
-          fontSize: isWinner ? 48 : 36,
+          fontSize: isWinner ? "clamp(2.5rem, 8vw, 3rem)" : "clamp(1.75rem, 6vw, 2.25rem)",
           lineHeight: 1,
           color,
           textShadow: isWinner ? `0 0 24px ${color}99` : "none",
@@ -252,11 +268,11 @@ export default function MatchPredictor() {
         </div>
 
         {/* ── Team picker ──────────────────────────────────────────── */}
-        <div className="grid gap-3 items-center" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
+        <div className="grid gap-3 items-center grid-cols-1 sm:grid-cols-[1fr_auto_1fr]">
           {/* Home dropdown */}
           <div
             className="glass-card p-4"
-            style={{ borderColor: "rgba(245,197,24,0.2)" }}
+            style={{ borderColor: "rgba(245,197,24,0.2)", position: "relative", zIndex: 10, overflow: "visible" }}
           >
             <CountryWheel
               teams={teams}
@@ -267,14 +283,14 @@ export default function MatchPredictor() {
           </div>
 
           {/* VS badge */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center py-2 sm:py-0">
             <VsBadge />
           </div>
 
           {/* Away dropdown */}
           <div
             className="glass-card p-4"
-            style={{ borderColor: "rgba(245,197,24,0.2)" }}
+            style={{ borderColor: "rgba(245,197,24,0.2)", position: "relative", zIndex: 10, overflow: "visible" }}
           >
             <CountryWheel
               teams={teams}
@@ -389,14 +405,11 @@ export default function MatchPredictor() {
 
             {/* ── Scoreboard ──────────────────────────────────────── */}
             <div
-              className="grid gap-4 mb-5"
-              style={{ gridTemplateColumns: "1fr 90px 1fr" }}
+              className="grid gap-2 sm:gap-4 mb-5 grid-cols-[1fr_60px_1fr] sm:grid-cols-[1fr_90px_1fr]"
             >
               {/* Home team */}
               <div className="flex flex-col items-center gap-3 text-center">
-                <span style={{ fontSize: "2.8rem", lineHeight: 1 }}>
-                  {flagEmoji(result.home_team)}
-                </span>
+                <FlagImg team={result.home_team} size={52} />
                 <div className="font-display uppercase text-[13px] tracking-wider text-ivory leading-snug">
                   {result.home_team}
                   {homeIsWinner && (
@@ -431,9 +444,7 @@ export default function MatchPredictor() {
 
               {/* Away team */}
               <div className="flex flex-col items-center gap-3 text-center">
-                <span style={{ fontSize: "2.8rem", lineHeight: 1 }}>
-                  {flagEmoji(result.away_team)}
-                </span>
+                <FlagImg team={result.away_team} size={52} />
                 <div className="font-display uppercase text-[13px] tracking-wider text-ivory leading-snug">
                   {result.away_team}
                   {awayIsWinner && (
