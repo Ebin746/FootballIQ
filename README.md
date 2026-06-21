@@ -1,41 +1,41 @@
-# FootballIQ
+# World Cup Predictor
 
-FootballIQ is a machine learning pipeline designed to predict football match outcomes (Home Win, Draw, Away Win) by leverage historical ELO ratings, recent rolling team form, and tournament significance weighting.
-
-## Repository Structure
+Two parts, deployed separately:
 
 ```
-├── config.py             # Global configurations, features, and hyperparameters
-├── features.py           # Ingestion, cleaning, ELO calculation, and team form calculation
-├── model.py              # ML classifier models (Random Forest, XGBoost) and plotting utilities
-├── main.py               # Main pipeline orchestration script
-├── requirements.txt      # Project dependencies list
-├── .gitignore            # Git exclusions file
-└── results.csv           # Match history database (1990 - present)
+worldcup-app/
+├── backend/                  FastAPI — trains once, serves predictions
+│   ├── train.py              Run ONCE (needs results.csv) to produce artifacts/
+│   ├── artifacts/            model.pkl, team_state.pkl, groups.json, features.json
+│   ├── app/
+│   │   ├── main.py           FastAPI routes
+│   │   ├── simulation.py     Loads artifacts once; match + tournament sim logic
+│   │   └── schemas.py        Pydantic request/response models
+│   ├── requirements.txt
+│   └── README.md
+│
+└── frontend/                 React + Vite
+    ├── src/
+    │   ├── App.jsx            Tab shell (Match / World Cup)
+    │   ├── api.js              fetch wrapper for the backend
+    │   ├── index.css          Design system
+    │   └── components/
+    │       ├── MatchPredictor.jsx
+    │       └── WorldCupPredictor.jsx
+    ├── package.json
+    └── README.md
 ```
 
-## Features Used
+## Order of operations
+1. `cd backend && pip install -r requirements.txt`
+2. Drop `results.csv` into `backend/`, run `python train.py` once → fills `artifacts/`
+3. `uvicorn app.main:app --reload --port 8000`
+4. `cd frontend && npm install && npm run dev`
+5. Open http://localhost:5173
 
-* **ELO Ratings**: Simulates historical team strengths chronologically starting at a default rating of 1500, with K-factors adjusted by tournament prestige and extra points for home-field advantage.
-* **Rolling Form**: Calculates performance metrics over the last 5 matches for each team (wins, draws, losses, goals scored, goals conceded, goal difference).
-* **Tournament Importance**: Classifies tournaments into weight levels (e.g. World Cups carry higher weights than Friendlies).
-
-## Getting Started
-
-### 1. Install Dependencies
-Ensure you have Python installed, then run:
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Run Pipeline
-Execute the pipeline from the root directory:
-```bash
-python main.py
-```
-Running this will:
-1. Load and clean the match data from `results.csv`.
-2. Compute historical ELO ratings and team forms.
-3. Split the data into train and test sets (80/20 split).
-4. Train and evaluate **Random Forest** and **XGBoost** models.
-5. Output classification reports and save a feature importance plot to `feature_importance.png`.
+## Deploy
+- **Backend** → Render or Railway (see `backend/README.md`)
+- **Frontend** → Vercel or Netlify (see `frontend/README.md`)
+- After both are live, update:
+  - `backend/app/main.py` → `allow_origins` with your frontend's URL
+  - `frontend/.env` → `VITE_API_URL` with your backend's URL

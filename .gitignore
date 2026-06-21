@@ -1,0 +1,26 @@
+# ---------- Python (backend) ----------
+backend/venv/
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+
+# Don't ignore backend/artifacts/* — that's the trained model the API loads at runtime.
+# If you ever want to ignore a stray local CSV you dropped in for training, do it explicitly:
+backend/results.csv
+
+# ---------- Node / Vite (frontend) ----------
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.local
+
+# ---------- Editor / OS junk ----------
+.DS_Store
+.vscode/
+.idea/
+*.log
