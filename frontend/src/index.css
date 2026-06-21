@@ -2,27 +2,172 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Global resets & base styles ─────────────────────────────────── */
+/* ══ Google Fonts are loaded in index.html ════════════════════════════════ */
+
+/* ══ Keyframe Animations ══════════════════════════════════════════════════ */
+@keyframes shimmer {
+  0%   { background-position: -400% center; }
+  100% { background-position:  400% center; }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-7px); }
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0   rgba(245,197,24,0.5); }
+  100% { box-shadow: 0 0 0 18px rgba(245,197,24,0);   }
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(0)     rotate(0deg)   translateX(0);   opacity: 1; }
+  50%  { transform: translateY(48vh)  rotate(360deg) translateX(var(--sway, 40px)); }
+  100% { transform: translateY(105vh) rotate(720deg) translateX(0);   opacity: 0; }
+}
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes reveal-scale {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+@keyframes bounce-ball {
+  0%,100% { transform: translateY(0)    scaleY(1);   }
+  40%     { transform: translateY(-24px) scaleY(1.12); }
+  60%     { transform: translateY(-20px) scaleY(1);   }
+}
+@keyframes champion-glow {
+  0%,100% { text-shadow: 0 0 20px rgba(245,197,24,0.6); }
+  50%     { text-shadow: 0 0 40px rgba(245,197,24,1), 0 0 80px rgba(245,197,24,0.5); }
+}
+@keyframes bracket-draw {
+  from { stroke-dashoffset: 600; }
+  to   { stroke-dashoffset: 0;   }
+}
+@keyframes bar-grow {
+  from { width: 0%; }
+}
+@keyframes count-pulse {
+  0%  { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100%{ transform: scale(1); }
+}
+
+/* ══ Global base ══════════════════════════════════════════════════════════ */
 @layer base {
-  html,
-  body {
-    @apply m-0 p-0 min-h-screen bg-bg text-ivory font-body;
+  html, body {
+    @apply m-0 p-0 min-h-screen font-body;
+    background-color: #050d1a;
+    color: #e8edf5;
+    /* Subtle stadium-pitch horizontal lines */
     background-image: repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 119px,
-      rgba(244, 241, 232, 0.12) 119px,
-      rgba(244, 241, 232, 0.12) 120px
+      transparent 89px,
+      rgba(245,197,24,0.04) 89px,
+      rgba(245,197,24,0.04) 90px
     );
   }
 
   #root {
-    @apply max-w-[900px] mx-auto px-6 py-10 pb-20;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px 100px;
   }
 
-  /* Native select / input colour fix inside dark bg */
+  /* Scrollbar */
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #0d1b2e; }
+  ::-webkit-scrollbar-thumb { background: #f5c518; border-radius: 99px; }
+
+  /* Select option dark fix */
   select option {
-    background-color: #123c2e;
-    color: #f4f1e8;
+    background-color: #0d1b2e;
+    color: #e8edf5;
   }
+}
+
+/* ══ Reusable component layer ════════════════════════════════════════════ */
+@layer components {
+  /* Glassmorphism card */
+  .glass-card {
+    background: rgba(17,31,53,0.72);
+    border: 1px solid rgba(245,197,24,0.13);
+    border-radius: 18px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  /* Gold shimmer text effect */
+  .shimmer-text {
+    background: linear-gradient(
+      120deg,
+      #c89a12 0%,
+      #f5c518 30%,
+      #ffe97a 50%,
+      #f5c518 70%,
+      #c89a12 100%
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Primary CTA button */
+  .btn-gold {
+    @apply font-display font-semibold uppercase tracking-wider;
+    background: linear-gradient(135deg, #f5c518 0%, #c89a12 100%);
+    color: #050d1a;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .btn-gold:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(245,197,24,0.35);
+  }
+  .btn-gold:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  .btn-gold:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Subtle input */
+  .wc-input {
+    background: rgba(13,27,46,0.8);
+    border: 1px solid rgba(245,197,24,0.18);
+    color: #e8edf5;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: var(--font-body, Inter, sans-serif);
+  }
+  .wc-input:focus {
+    border-color: #f5c518;
+    box-shadow: 0 0 0 3px rgba(245,197,24,0.12);
+  }
+}
+
+/* ══ Utility animations ══════════════════════════════════════════════════ */
+@layer utilities {
+  .animate-reveal-up    { animation: reveal-up   0.5s ease-out forwards; }
+  .animate-reveal-scale { animation: reveal-scale 0.45s ease-out forwards; }
+  .animate-champion-glow{ animation: champion-glow 2s ease-in-out infinite; }
+  .animate-bounce-ball  { animation: bounce-ball 0.9s ease-in-out infinite; }
+  .animate-float        { animation: float 3s ease-in-out infinite; }
+  .animate-pulse-ring   { animation: pulse-ring 1.8s ease-out infinite; }
+}
+
+/* ══ Bracket SVG animation ═══════════════════════════════════════════════ */
+.bracket-line {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+}
+.bracket-line.draw {
+  animation: bracket-draw 0.6s ease-out forwards;
 }
