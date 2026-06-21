@@ -186,9 +186,10 @@ FEATURES = [
     "neutral", "tournament_importance",
 ]
 
-split_ind = int(len(df) * 0.8)
-train_df = df.iloc[:split_ind]
-test_df = df.iloc[split_ind:]
+#split_ind = int(len(df) * 0.8)
+
+train_df = df
+#test_df = df.iloc[split_ind:]
 
 xgb = XGBClassifier(
     objective="multi:softmax",
@@ -200,10 +201,10 @@ xgb = XGBClassifier(
 )
 xgb.fit(train_df[FEATURES], train_df["result"])
 
-from sklearn.metrics import accuracy_score, classification_report
-pred = xgb.predict(test_df[FEATURES])
-print("Test accuracy:", accuracy_score(test_df["result"], pred))
-print(classification_report(test_df["result"], pred))
+#from sklearn.metrics import accuracy_score, classification_report
+#pred = xgb.predict(test_df[FEATURES])
+#print("Test accuracy:", accuracy_score(test_df["result"], pred))
+#print(classification_report(test_df["result"], pred))
 
 # -----------------------------------------------------------------------------
 # 5. Build latest team_state snapshot (what the API will simulate from)
