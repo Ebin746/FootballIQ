@@ -40,10 +40,12 @@ def create_match_features_from_state(home_team, away_team, team_state,
     home = team_state[home_team]
     away = team_state[away_team]
 
+    h_adj = 0.0 if neutral else 100.0
+
     row = {
         "elo_home": home["elo"],
         "elo_away": away["elo"],
-        "elo_diff": home["elo"] - away["elo"],
+        "elo_diff": (home["elo"] + h_adj) - away["elo"],
         "home_wins_last5": home["wins_last5"],
         "away_wins_last5": away["wins_last5"],
         "home_goals_scored_avg5": home["goals_scored_avg5"],

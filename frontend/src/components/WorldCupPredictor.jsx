@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { predictWorldCup } from "../api.js";
 import { isoCode } from "../utils/flags.js";
-import TournamentBracket from "./TournamentBracket.jsx";
+import WinProbabilityChart from "./WinProbabilityChart.jsx";
 
 /* Inline flag image from flagcdn.com */
 function FlagImg({ team, size = 28 }) {
@@ -21,6 +21,19 @@ function FlagImg({ team, size = 28 }) {
 
 /* ── Animated football loading indicator ─────────────────────────────── */
 function FootballLoader({ n }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    // 1 simulation = 1.5s (1500ms)
+    const interval = setInterval(() => {
+      setCount((c) => {
+        if (c >= n) return n;
+        return c + 1;
+      });
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [n]);
+
   return (
     <div className="flex flex-col items-center gap-4 py-8">
       <span
@@ -31,8 +44,12 @@ function FootballLoader({ n }) {
       </span>
       <div className="font-mono text-[13px] text-muted tracking-wide text-center">
         Playing out <span className="text-gold font-bold">{n}</span> tournaments…
-        <br />
-        <span className="text-[11px] opacity-60">this may take a moment for large counts</span>
+        <div className="mt-3 font-bold text-[15px] text-ivory">
+          {count} <span className="text-muted font-normal text-[13px]">/ {n} completed</span>
+        </div>
+        <span className="text-[11px] opacity-60 block mt-1">
+          (simulating matches)
+        </span>
       </div>
     </div>
   );
@@ -129,7 +146,7 @@ function Leaderboard({ results }) {
    Main Component
    ══════════════════════════════════════════════════════════════════════════ */
 export default function WorldCupPredictor() {
-  const [nSimulations, setNSimulations] = useState(200);
+  const [nSimulations, setNSimulations] = useState(100);
   const [results,      setResults]      = useState(null);
   const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState("");
@@ -173,35 +190,21 @@ export default function WorldCupPredictor() {
         </div>
 
         {/* Simulations input */}
-        <div className="flex flex-col gap-2 max-w-[240px] mb-6">
+        <div className="flex flex-col gap-3 max-w-[340px] mb-6">
           <label className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
             Number of simulations
           </label>
-          <div className="relative">
-            <input
-              type="number"
-              min={10}
-              max={2000}
-              step={10}
-              value={nSimulations}
-              onChange={(e) => setNSimulations(Number(e.target.value))}
-              className="wc-input w-full px-4 py-3 text-[15px] font-mono pr-16"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[11px] text-muted">
-              runs
-            </span>
-          </div>
-          {/* Quick presets */}
-          <div className="flex gap-2 flex-wrap mt-1">
-            {[100, 200, 500, 1000].map((n) => (
+          <div className="flex gap-2.5 flex-wrap">
+            {[20, 50, 100, 200, 250, 500, 1000].map((n) => (
               <button
                 key={n}
                 onClick={() => setNSimulations(n)}
-                className="font-mono text-[11px] px-3 py-1 rounded-full border transition-all cursor-pointer"
+                className="font-mono text-[13px] px-3.5 py-2 rounded-lg border transition-all cursor-pointer shadow-sm hover:opacity-100"
                 style={{
-                  borderColor: nSimulations === n ? "#f5c518" : "rgba(245,197,24,0.2)",
+                  borderColor: nSimulations === n ? "rgba(245,197,24,0.6)" : "rgba(245,197,24,0.15)",
                   color:       nSimulations === n ? "#f5c518" : "#8ba3c2",
-                  background:  nSimulations === n ? "rgba(245,197,24,0.1)" : "transparent",
+                  background:  nSimulations === n ? "rgba(245,197,24,0.12)" : "rgba(13,27,46,0.6)",
+                  boxShadow:   nSimulations === n ? "0 0 12px rgba(245,197,24,0.15)" : "none",
                 }}
               >
                 {n}
@@ -283,13 +286,13 @@ export default function WorldCupPredictor() {
         </div>
       )}
 
-      {/* ══ Tournament Bracket ═══════════════════════════════════════ */}
+      {/* ══ Win Probability Chart ════════════════════════════════════ */}
       {results && !loading && (
         <div
-          className="glass-card p-6 sm:p-8 overflow-x-auto"
+          className="glass-card p-6 sm:p-8"
           style={{ animation: "reveal-up 0.5s 0.15s ease-out both" }}
         >
-          <TournamentBracket results={results} />
+          <WinProbabilityChart results={results} />
         </div>
       )}
 
