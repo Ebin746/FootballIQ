@@ -24,6 +24,25 @@ ARTIFACTS_DIR = "artifacts"
 # 1. Load + clean data
 # -----------------------------------------------------------------------------
 results = pd.read_csv("results.csv")
+
+# Map old country names to their modern equivalents
+name_mapping = {
+    "Czechoslovakia": "Czech Republic",
+    "German DR": "Germany",
+    "North Vietnam": "Vietnam",
+    "Vietnam Republic": "Vietnam",
+    "South Yemen": "Yemen",
+    "Yemen DPR": "Yemen",
+    "Yugoslavia": "Serbia",
+    "Zaire": "DR Congo",
+    "Swaziland": "Eswatini",
+    "Burma": "Myanmar",
+    "Ceylon": "Sri Lanka",
+    "Netherlands Antilles": "Curaçao",
+    "Macedonia": "North Macedonia"
+}
+results["home_team"] = results["home_team"].replace(name_mapping)
+results["away_team"] = results["away_team"].replace(name_mapping)
 results["date"] = pd.to_datetime(results["date"])
 results = results[results["date"] >= "1990-1-1"]
 results = results.sort_values("date")
